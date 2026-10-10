@@ -238,7 +238,7 @@ export default function UserAnalytics() {
                 sentimentDistribution: sentiments
             };
 
-            const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            const data = await (await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ export default function UserAnalytics() {
                     ],
                     max_tokens: 250
                 })
-            });
+            })).json();
 
             const defaultInsight = "Over the past 14 days, you demonstrated an impressive 59% average belief reduction across high-stakes situations like presentations and technical milestones. Your emotional trajectory reflects strong resilience, with positive affect (Joy & Trust) steadily displacing early anxiety. Continue utilizing Evidence Scaling before milestones to sustain cognitive composure.";
             const reply = data.choices?.[0]?.message?.content || defaultInsight;
