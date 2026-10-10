@@ -43,6 +43,7 @@ const App = () => {
                     <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
                     <Route path="/lumina" element={<ProtectedRoute><LuminaPage /></ProtectedRoute>} />
                     <Route path="/sentience" element={<ProtectedRoute><SentienceLanding /></ProtectedRoute>} />
+                    <Route path="/health-sakhi" element={<ProtectedRoute><SentienceLanding /></ProtectedRoute>} />
                     <Route path="/mind-info" element={<ProtectedRoute><MindInfo /></ProtectedRoute>} />
                     <Route path="/emotional-unloading" element={<ProtectedRoute><EmotionalUnloading /></ProtectedRoute>} />
                     <Route path="/emotional-patterns" element={<ProtectedRoute><EmotionalPatterns /></ProtectedRoute>} />

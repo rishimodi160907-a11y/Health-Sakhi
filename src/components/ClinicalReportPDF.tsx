@@ -268,7 +268,7 @@ export const ClinicalReportPDF = ({ dateRange, generationDate, metrics }: Clinic
             )}
 
             <View style={styles.footer}>
-                <Text style={styles.footerText}>Sentience AI — Clinical Summary Report (Strictly Confidential)</Text>
+                <Text style={styles.footerText}>Health Sakhi AI — Clinical Summary Report (Strictly Confidential)</Text>
                 <Text style={styles.footerText}>Page 1</Text>
             </View>
         </Page>
@@ -331,7 +331,7 @@ export const ClinicalReportPDF = ({ dateRange, generationDate, metrics }: Clinic
             )}
 
             <View style={styles.footer}>
-                <Text style={styles.footerText}>Sentience AI — Clinical Summary Report (Strictly Confidential)</Text>
+                <Text style={styles.footerText}>Health Sakhi AI — Clinical Summary Report (Strictly Confidential)</Text>
                 <Text style={styles.footerText}>Page 2</Text>
             </View>
         </Page>
@@ -417,7 +417,7 @@ export const ClinicalReportPDF = ({ dateRange, generationDate, metrics }: Clinic
             </View>
 
             <View style={styles.footer}>
-                <Text style={styles.footerText}>Sentience AI — Clinical Summary Report (Strictly Confidential)</Text>
+                <Text style={styles.footerText}>Health Sakhi AI — Clinical Summary Report (Strictly Confidential)</Text>
                 <Text style={styles.footerText}>Page 3</Text>
             </View>
         </Page>
@@ -449,7 +449,7 @@ export const ClinicalReportPDF = ({ dateRange, generationDate, metrics }: Clinic
                 </View>
 
                 <View style={styles.footer}>
-                    <Text style={styles.footerText}>Sentience AI — Clinical Summary Report (Strictly Confidential)</Text>
+                    <Text style={styles.footerText}>Health Sakhi AI — Clinical Summary Report (Strictly Confidential)</Text>
                     <Text style={styles.footerText}>Page 4</Text>
                 </View>
             </Page>
@@ -478,7 +478,7 @@ export const ClinicalReportPDF = ({ dateRange, generationDate, metrics }: Clinic
                             {sample.messages.map((msg, mi) => (
                                 <View key={mi} style={{ flexDirection: 'row', marginBottom: 3, paddingLeft: msg.role === 'assistant' ? 0 : 20 }}>
                                     <Text style={{ fontSize: 8, fontWeight: 600, color: msg.role === 'assistant' ? colors.accent : colors.muted, width: 60 }}>
-                                        {msg.role === 'assistant' ? 'Sentience' : 'User'}:
+                                        {msg.role === 'assistant' ? 'Health Sakhi' : 'User'}:
                                     </Text>
                                     <Text style={{ fontSize: 8, flex: 1, lineHeight: 1.4, color: '#444' }}>
                                         {msg.text.slice(0, 150)}{msg.text.length > 150 ? '…' : ''}
@@ -517,12 +517,12 @@ export const ClinicalReportPDF = ({ dateRange, generationDate, metrics }: Clinic
                 <Text style={{ fontSize: 8, fontWeight: 600, color: '#92400e', marginBottom: 4, textTransform: 'uppercase' }}>Disclaimer</Text>
                 <Text style={{ fontSize: 7, lineHeight: 1.5, color: '#78350f' }}>
                     This report is auto-generated from user-reported data and AI analysis. It is intended to supplement — not replace — clinical assessment.
-                    All AI-generated insights should be validated by a qualified mental health professional. Sentience AI does not provide medical diagnoses.
+                    All AI-generated insights should be validated by a qualified mental health professional. Health Sakhi AI does not provide medical diagnoses.
                 </Text>
             </View>
 
             <View style={styles.footer}>
-                <Text style={styles.footerText}>Sentience AI — Clinical Summary Report (Strictly Confidential)</Text>
+                <Text style={styles.footerText}>Health Sakhi AI — Clinical Summary Report (Strictly Confidential)</Text>
                 <Text style={styles.footerText}>Page {metrics.journal.allEntries.length > 0 ? '5' : '4'}</Text>
             </View>
         </Page>

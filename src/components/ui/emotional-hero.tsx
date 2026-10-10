@@ -39,7 +39,7 @@ const Nav = () => {
         <nav className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-6 py-6 text-white mix-blend-difference">
             <div className="flex items-center gap-2">
                 <Brain className="text-3xl text-cyan-400" />
-                <span className="font-bold text-xl tracking-tighter">SENTIENCE</span>
+                <span className="font-bold text-xl tracking-tighter">HEALTH SAKHI</span>
             </div>
             <button
                 onClick={() => {

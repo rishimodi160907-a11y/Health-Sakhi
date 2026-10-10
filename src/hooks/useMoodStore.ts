@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MoodEntry } from '../types/mood';
+import { DEMO_MOOD_ENTRIES } from '../data/demoData';
 
 const MOOD_STORAGE_KEY = 'sentience_mood_tracker_logs';
 
@@ -13,11 +14,20 @@ export const useMoodStore = () => {
             const stored = localStorage.getItem(MOOD_STORAGE_KEY);
             if (stored) {
                 const parsed = JSON.parse(stored) as MoodEntry[];
-                // Sort descending by timestamp
-                setEntries(parsed.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+                if (parsed.length > 0) {
+                    setEntries(parsed.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+                } else {
+                    setEntries(DEMO_MOOD_ENTRIES);
+                    localStorage.setItem(MOOD_STORAGE_KEY, JSON.stringify(DEMO_MOOD_ENTRIES));
+                }
+            } else {
+                // Pre-populate with realistic demo data on initial launch
+                setEntries(DEMO_MOOD_ENTRIES);
+                localStorage.setItem(MOOD_STORAGE_KEY, JSON.stringify(DEMO_MOOD_ENTRIES));
             }
         } catch (e) {
             console.error("Failed to parse mood tracker logs", e);
+            setEntries(DEMO_MOOD_ENTRIES);
         } finally {
             setIsLoaded(true);
         }

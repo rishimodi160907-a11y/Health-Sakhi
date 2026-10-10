@@ -90,7 +90,7 @@ const VentingTools = () => {
     const handleReframe = async () => {
         if (!thought.trim()) return;
 
-        setStatusMsg("Consulting Sentience...");
+        setStatusMsg("Consulting Health Sakhi...");
         let apiKey = localStorage.getItem('groq_api_key') || import.meta.env.VITE_GROQ_API_KEY;
 
         if (!apiKey) {
@@ -331,7 +331,7 @@ export default function EmotionalUnloading() {
                 <Link
                     to="/sentience"
                     className="flex items-center gap-2 text-white/50 hover:text-white transition-colors bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
-                    title="Back to Sentience"
+                    title="Back to Health Sakhi"
                 >
                     <ArrowLeft size={16} />
                     <span className="text-sm font-medium">Back</span>

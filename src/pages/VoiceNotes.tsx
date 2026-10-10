@@ -212,7 +212,7 @@ export default function VoiceNotes() {
                     <Link
                         to="/sentience"
                         className="flex items-center gap-2 text-white/60 hover:text-white transition-colors group"
-                        title="Back to Sentience"
+                        title="Back to Health Sakhi"
                     >
                         <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
                             <ArrowLeft size={20} />

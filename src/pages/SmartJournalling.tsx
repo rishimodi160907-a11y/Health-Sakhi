@@ -186,7 +186,7 @@ export default function SmartJournalling() {
             const groq = new Groq({ apiKey: apiKey, dangerouslyAllowBrowser: true });
 
             const prompt = `
-                You are 'Sentience,' an empathetic mental health companion. Analyze the user's journal entry. 
+                You are 'Health Sakhi,' an empathetic mental health companion. Analyze the user's journal entry. 
                 RETURN ONLY RAW JSON. Do not use Markdown formatting.
                 
                 Schema:
@@ -264,7 +264,7 @@ export default function SmartJournalling() {
                 </Link>
                 <div className="flex items-center gap-2">
                     <BrainCircuit size={20} className="text-indigo-400" />
-                    <span className="text-sm font-bold tracking-widest uppercase text-white/80">Sentience AI</span>
+                    <span className="text-sm font-bold tracking-widest uppercase text-white/80">Health Sakhi AI</span>
                     <button
                         onClick={() => setShowSettings(true)}
                         className="p-2 rounded-full hover:bg-white/10 transition-colors text-white/50 hover:text-white"
@@ -387,7 +387,7 @@ export default function SmartJournalling() {
                                     <h3 className="text-lg md:text-xl font-medium text-indigo-100 leading-snug">
                                         {analysis.reflection}
                                     </h3>
-                                    <p className="text-xs text-white/40 mt-4 uppercase tracking-widest">Sentience Asks</p>
+                                    <p className="text-xs text-white/40 mt-4 uppercase tracking-widest">Health Sakhi Asks</p>
                                 </div>
 
                                 {/* Action Item */}
@@ -410,7 +410,7 @@ export default function SmartJournalling() {
                                 </div>
                                 <h3 className="text-lg font-medium text-white/60 mb-2">Ready to Reflect?</h3>
                                 <p className="text-sm text-white/40 max-w-xs">
-                                    Write your thoughts and let Sentience help you find clarity through AI analysis.
+                                    Write your thoughts and let Health Sakhi help you find clarity through AI analysis.
                                 </p>
                             </div>
                         )}

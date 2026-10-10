@@ -26,6 +26,20 @@ export default function Auth() {
 
         try {
             if (isLogin) {
+                // Built-in Demo Login (allows testing immediately without an active Supabase cloud database)
+                if (email.trim() === 'pe@2' && (password === 'password' || !password)) {
+                    const demoProfile = {
+                        id: '00000000-0000-0000-0000-000000000001',
+                        email: 'pe@2',
+                        full_name: 'Project Exhibition',
+                        username: 'pe_user',
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata',
+                    };
+                    setUser(demoProfile);
+                    navigate('/sentience');
+                    return;
+                }
+
                 // LOG IN FLOW
                 const { data, error: fetchError } = await supabase
                     .from('profiles')
@@ -34,7 +48,7 @@ export default function Auth() {
                     .single();
 
                 if (fetchError || !data) {
-                    setError('Invalid credentials');
+                    setError('Invalid credentials. If you have not configured Supabase, use the Quick Demo Login below.');
                     setIsLoading(false);
                     return;
                 }
@@ -138,7 +152,7 @@ export default function Auth() {
                     <p className="text-white/40 text-sm">
                         {isLogin
                             ? 'Enter your details to access your safe space'
-                            : 'Join Sentience to start your mindful journey'}
+                            : 'Join Health Sakhi to start your mindful journey'}
                     </p>
                 </div>
 
@@ -258,6 +272,27 @@ export default function Auth() {
                                 </>
                             )}
                         </button>
+
+                        {/* Quick Demo Login Option */}
+                        <div className="pt-3 text-center">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const demoProfile = {
+                                        id: '00000000-0000-0000-0000-000000000001',
+                                        email: 'pe@2',
+                                        full_name: 'Project Exhibition',
+                                        username: 'pe_user',
+                                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata',
+                                    };
+                                    setUser(demoProfile);
+                                    navigate('/sentience');
+                                }}
+                                className="text-xs text-white/50 hover:text-white transition-colors underline decoration-dotted underline-offset-4 py-1"
+                            >
+                                ⚡ One-Click Demo Login (pe@2)
+                            </button>
+                        </div>
                     </form>
                 </div>
             </motion.div>

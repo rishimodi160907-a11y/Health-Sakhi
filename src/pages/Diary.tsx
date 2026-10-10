@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, BookOpen, Loader2, CalendarDays, Brain, Sparkles, ChevronDown, Home, MessageSquare } from 'lucide-react';
 import NeuralBackground from '../components/ui/flow-field-background';
+import { DEMO_JOURNAL_ENTRIES } from '../data/demoData';
 
 type JournalEntry = {
     id: string;
@@ -30,9 +31,30 @@ export default function Diary() {
     const [conversations, setConversations] = useState<Record<string, ConversationMessage[]>>({});
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            loadDemoDiary();
+            return;
+        }
         fetchEntries();
     }, [user]);
+
+    const loadDemoDiary = () => {
+        const demoMapped = DEMO_JOURNAL_ENTRIES.map(e => ({
+            id: e.id,
+            created_at: e.created_at,
+            raw_text: e.raw_text,
+            sentiment: e.sentiment,
+            detected_emotions: e.detected_emotions,
+            core_insight: e.core_insight
+        }));
+        setEntries(demoMapped);
+        const convoMap: Record<string, ConversationMessage[]> = {};
+        DEMO_JOURNAL_ENTRIES.forEach(e => {
+            convoMap[e.id] = e.conversation;
+        });
+        setConversations(convoMap);
+        setIsLoading(false);
+    };
 
     const fetchEntries = async () => {
         setIsLoading(true);
@@ -43,16 +65,21 @@ export default function Diary() {
                 .eq('user_id', user!.id)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (error || !data || data.length === 0) {
+                loadDemoDiary();
+                return;
+            }
             
-            const mappedData = (data || []).map(entry => ({
+            const mappedData = data.map(entry => ({
                 ...entry,
+                raw_text: entry.raw_text || entry.content,
                 detected_emotions: entry.journal_emotions?.map((e: any) => e.emotion_label) || []
             }));
             
             setEntries(mappedData);
         } catch (error) {
-            console.error('Error fetching diary entries:', error);
+            console.error('Error fetching diary entries, falling back to demo:', error);
+            loadDemoDiary();
         } finally {
             setIsLoading(false);
         }
@@ -124,7 +151,7 @@ export default function Diary() {
                         Personal <span className="font-semibold text-violet-400">Diary</span>
                     </h1>
                     <p className="text-white/40 mt-3 font-light tracking-wide text-sm md:text-base">
-                        A secure archive of your thoughts, reflections, and Sentience insights.
+                        A secure archive of your thoughts, reflections, and Health Sakhi insights.
                     </p>
                 </div>
 

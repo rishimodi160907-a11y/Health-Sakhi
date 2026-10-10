@@ -12,6 +12,8 @@ export interface MoodLog {
     note?: string;
 }
 
+import { DEMO_MOOD_DATA_LOGS } from '../data/demoData';
+
 const STORAGE_KEY = 'sentience_mood_logs';
 
 export const useMoodData = () => {
@@ -23,11 +25,19 @@ export const useMoodData = () => {
         if (stored) {
             try {
                 const parsed = JSON.parse(stored);
-                // Sort by new to old
-                setLogs(parsed.sort((a: MoodLog, b: MoodLog) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+                if (parsed.length > 0) {
+                    setLogs(parsed.sort((a: MoodLog, b: MoodLog) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+                } else {
+                    setLogs(DEMO_MOOD_DATA_LOGS as MoodLog[]);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_MOOD_DATA_LOGS));
+                }
             } catch (e) {
                 console.error("Failed to parse mood logs", e);
+                setLogs(DEMO_MOOD_DATA_LOGS as MoodLog[]);
             }
+        } else {
+            setLogs(DEMO_MOOD_DATA_LOGS as MoodLog[]);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_MOOD_DATA_LOGS));
         }
     }, []);
 

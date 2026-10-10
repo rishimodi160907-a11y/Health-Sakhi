@@ -3,6 +3,8 @@ import { ThoughtReframerSession } from '../types/reframer';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
+import { DEMO_CBT_SESSIONS } from '../data/demoData';
+
 export const useReframerHistory = () => {
     const { user } = useAuth();
     const [sessions, setSessions] = useState<ThoughtReframerSession[]>([]);
@@ -10,7 +12,7 @@ export const useReframerHistory = () => {
 
     const refresh = useCallback(async () => {
         if (!user) {
-            setSessions([]);
+            setSessions(DEMO_CBT_SESSIONS);
             setIsLoaded(true);
             return;
         }
@@ -31,12 +33,23 @@ export const useReframerHistory = () => {
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error fetching reframing sessions:', error);
+            if (error || !data || data.length === 0) {
+                // If remote database is empty or not configured, load elite demo sessions
+                const localSaved = localStorage.getItem('sentience_reframer_history_local');
+                if (localSaved) {
+                    try {
+                        const parsed = JSON.parse(localSaved);
+                        if (parsed.length > 0) {
+                            setSessions(parsed);
+                            return;
+                        }
+                    } catch (e) { }
+                }
+                setSessions(DEMO_CBT_SESSIONS);
                 return;
             }
 
-            if (data) {
+            if (data && data.length > 0) {
                 // Map the database rows back to the shape expected by the frontend
                 const mappedSessions: ThoughtReframerSession[] = data.map(row => ({
                     id: row.id,

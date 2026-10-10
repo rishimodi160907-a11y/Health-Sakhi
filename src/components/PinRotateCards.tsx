@@ -157,7 +157,7 @@ export default function PinRotateCards() {
                     </span>
                 </h2>
                 <p className="max-w-3xl text-lg md:text-2xl text-neutral-400 font-light leading-relaxed mb-12">
-                    Use these principles within Sentience to untangle your thoughts and build lasting emotional resilience.
+                    Use these principles within Health Sakhi to untangle your thoughts and build lasting emotional resilience.
                 </p>
                 <div className="w-[1px] h-32 bg-gradient-to-b from-cyan-500 to-transparent" />
             </section>

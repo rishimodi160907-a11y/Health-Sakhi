@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 Sentience : Mental Wellbeing and Literacy
+# 🧠 Health Sakhi : Mental Wellbeing and Literacy
 
 ### *Where Introspection Meets Intelligence*
 
@@ -22,7 +22,7 @@ A cinematic, AI-powered emotional intelligence platform — combining immersive 
 
 ## 🌟 About
 
-**Sentience** is a full-stack emotional intelligence platform that goes far beyond traditional journaling apps. Built at the intersection of clinical psychology, cutting-edge web technology, and AI, Sentience provides a safe, immersive, and deeply personalized space for users to explore, understand, and transform their inner world.
+**Health Sakhi** is a full-stack emotional intelligence platform that goes far beyond traditional journaling apps. Built at the intersection of clinical psychology, cutting-edge web technology, and AI, Health Sakhi provides a safe, immersive, and deeply personalized space for users to explore, understand, and transform their inner world.
 
 > *"Between stimulus and response there is a space. In that space is our power to choose our response."* — Viktor Frankl
 

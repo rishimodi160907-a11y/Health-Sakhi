@@ -7,6 +7,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import { ClinicalReportPDF, ClinicalReportProps } from '../components/ClinicalReportPDF';
 import { ArrowLeft, Loader2, FileDown, CalendarDays, Home, ShieldCheck } from 'lucide-react';
 import NeuralBackground from '../components/ui/flow-field-background';
+import { DEMO_MOOD_ENTRIES, DEMO_CBT_SESSIONS, DEMO_JOURNAL_ENTRIES } from '../data/demoData';
 
 type TimeRange = '30d' | '90d';
 
@@ -33,12 +34,22 @@ export default function DataExport() {
             const periodDays = timeRange === '30d' ? 30 : 90;
 
             // ────── 1. Fetch Mood Logs (full) ──────
-            const { data: moods } = await supabase
+            const { data: rawMoods } = await supabase
                 .from('mood_logs')
                 .select('*, mood_triggers(trigger_name)')
                 .eq('user_id', user!.id)
                 .gte('created_at', pastDateString)
                 .order('created_at', { ascending: true });
+
+            const moods = (rawMoods && rawMoods.length > 0) ? rawMoods : DEMO_MOOD_ENTRIES.map(m => ({
+                created_at: m.timestamp,
+                valence: m.compositeValence,
+                arousal: m.compositeArousal,
+                dominant_family: m.dominantFamily,
+                mood_triggers: m.triggers.map(t => ({ trigger_name: t })),
+                triggers: m.triggers,
+                notes: m.freeNote
+            }));
 
             let avgValence = 0;
             let avgArousal = 0;
@@ -81,12 +92,27 @@ export default function DataExport() {
                 .sort((a, b) => b.count - a.count);
 
             // ────── 2. Fetch CBT Reframing Sessions (ALL columns) ──────
-            const { data: reframes } = await supabase
+            const { data: rawReframes } = await supabase
                 .from('thought_reframing_sessions')
                 .select('*, trs_distortions(distortion_id)')
                 .eq('user_id', user!.id)
                 .gte('created_at', pastDateString)
                 .order('created_at', { ascending: false });
+
+            const reframes = (rawReframes && rawReframes.length > 0) ? rawReframes : DEMO_CBT_SESSIONS.map(r => ({
+                created_at: r.createdAt,
+                situation_description: r.situation,
+                automatic_thought: r.automaticThought,
+                cognitive_distortions: r.identifiedDistortions,
+                trs_distortions: r.identifiedDistortions.map(d => ({ distortion_id: d })),
+                initial_belief: r.initialBelief,
+                final_belief: r.finalBelief,
+                selected_reframe: r.selectedReframe,
+                takeaway: r.personalTakeaway,
+                duration_minutes: r.durationMinutes,
+                initial_emotions: r.initialEmotions.map(e => e.emotionId),
+                final_emotions: r.finalEmotions.map(e => e.emotionId)
+            }));
 
             let avgBeliefShift = 0;
             let avgDuration = 0;
@@ -137,12 +163,28 @@ export default function DataExport() {
                 .slice(0, 5);
 
             // ────── 3. Fetch Journal Entries (ALL columns) ──────
-            const { data: journals } = await supabase
+            const { data: rawJournals } = await supabase
                 .from('journal_entries')
                 .select('*, journal_emotions(emotion_label), journal_distortions(distortion_label), journal_coping_strategies(strategy_text)')
                 .eq('user_id', user!.id)
                 .gte('created_at', pastDateString)
                 .order('created_at', { ascending: false });
+
+            const journals = (rawJournals && rawJournals.length > 0) ? rawJournals : DEMO_JOURNAL_ENTRIES.map(j => ({
+                id: j.id,
+                created_at: j.created_at,
+                sentiment: j.sentiment,
+                mood_score: j.mood_score,
+                detected_emotions: j.detected_emotions,
+                journal_emotions: j.detected_emotions.map(e => ({ emotion_label: e })),
+                detected_distortions: j.cognitive_distortions,
+                journal_distortions: j.cognitive_distortions.map(d => ({ distortion_label: d })),
+                coping_strategies: j.coping_strategies,
+                journal_coping_strategies: j.coping_strategies.map(s => ({ strategy_text: s })),
+                core_insight: j.core_insight,
+                raw_text: j.raw_text,
+                content: j.content
+            }));
 
             const sentimentCounts: Record<string, number> = {};
             const journalEmotionCounts: Record<string, number> = {};
@@ -228,13 +270,22 @@ export default function DataExport() {
             // ────── 4. Fetch Journal Conversations ──────
             const journalIds = (journals || []).map(j => j.id);
             let conversationMessages: any[] = [];
-            if (journalIds.length > 0) {
+            if (rawJournals && rawJournals.length > 0 && journalIds.length > 0) {
                 const { data: convos } = await supabase
                     .from('journal_conversations')
                     .select('*')
                     .in('journal_id', journalIds)
                     .order('created_at', { ascending: true });
                 conversationMessages = convos || [];
+            } else {
+                conversationMessages = DEMO_JOURNAL_ENTRIES.flatMap(j =>
+                    j.conversation.map(c => ({
+                        journal_id: j.id,
+                        role: c.role,
+                        message: c.message,
+                        created_at: c.created_at
+                    }))
+                );
             }
 
             const totalConvoMessages = conversationMessages.length;
@@ -469,7 +520,7 @@ export default function DataExport() {
                                     >
                                         <PDFDownloadLink
                                             document={<ClinicalReportPDF {...reportData} />}
-                                            fileName={`Sentience_Clinical_Report_${timeRange}_${new Date().toISOString().split('T')[0]}.pdf`}
+                                            fileName={`Health_Sakhi_Clinical_Report_${timeRange}_${new Date().toISOString().split('T')[0]}.pdf`}
                                             className="group relative px-8 py-4 rounded-full overflow-hidden border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-500 flex items-center justify-center gap-3 w-full sm:w-auto mx-auto shadow-[0_0_30px_rgba(16,185,129,0.1)] hover:shadow-[0_0_40px_rgba(16,185,129,0.3)] font-medium tracking-wide"
                                         >
                                             <FileDown size={20} className="transition-transform group-hover:-translate-y-0.5" />

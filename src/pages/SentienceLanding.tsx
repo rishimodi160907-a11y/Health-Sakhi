@@ -235,11 +235,11 @@ export default function SentienceLanding() {
                     {/* Main Title */}
                     <motion.h1
                         initial={{ opacity: 0, letterSpacing: "0.6em" }}
-                        animate={{ opacity: 1, letterSpacing: "0.25em" }}
+                        animate={{ opacity: 1, letterSpacing: "0.2em" }}
                         transition={{ duration: 2.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                        className="text-5xl md:text-7xl lg:text-[7.5rem] font-extralight uppercase text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/40 tracking-[0.25em] mix-blend-plus-lighter leading-none mb-6"
+                        className="text-5xl md:text-7xl lg:text-[7.5rem] font-extralight uppercase text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/40 tracking-[0.2em] mix-blend-plus-lighter leading-none mb-6 text-center"
                     >
-                        Sentience
+                        Health Sakhi
                     </motion.h1>
 
                     {/* Animated rule */}
@@ -512,7 +512,7 @@ export default function SentienceLanding() {
                         Built for those who dare to feel
                     </motion.p>
                     <p className="text-[9px] uppercase tracking-[0.4em] text-white/[0.05] font-light">
-                        Sentience — Emotional Intelligence Platform
+                        Health Sakhi — Emotional Intelligence Platform
                     </p>
                 </div>
             </footer>

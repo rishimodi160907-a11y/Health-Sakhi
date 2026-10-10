@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { ArrowLeft, Loader2, Sparkles, TrendingUp, CalendarDays, Home, Brain, BookOpen, Activity, Heart } from 'lucide-react';
 import NeuralBackground from '../components/ui/flow-field-background';
+import { DEMO_MOOD_ENTRIES, DEMO_CBT_SESSIONS, DEMO_JOURNAL_ENTRIES } from '../data/demoData';
 
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || (typeof window !== 'undefined' ? localStorage.getItem('groq_api_key') || '' : '');
 
@@ -63,24 +64,31 @@ export default function UserAnalytics() {
             const pastDateString = pastDate.toISOString();
 
             // 1. Fetch Mood Logs (full)
-            const { data: moods } = await supabase
+            const { data: rawMoods } = await supabase
                 .from('mood_logs')
                 .select('*')
                 .eq('user_id', user!.id)
                 .gte('created_at', pastDateString)
                 .order('created_at', { ascending: true });
 
-            const formattedMoods = (moods || []).map(m => ({
+            const moods = (rawMoods && rawMoods.length > 0) ? rawMoods : DEMO_MOOD_ENTRIES.map(m => ({
+                created_at: m.timestamp,
+                valence: m.compositeValence,
+                arousal: m.compositeArousal,
+                dominant_family: m.dominantFamily
+            }));
+
+            const formattedMoods = moods.map(m => ({
                 date: new Date(m.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 valence: m.valence,
                 arousal: m.arousal
             }));
             setMoodData(formattedMoods);
-            setTotalMoodLogs(moods?.length || 0);
+            setTotalMoodLogs(moods.length);
 
             // Dominant family distribution
             const familyCounts: Record<string, number> = {};
-            moods?.forEach(m => {
+            moods.forEach(m => {
                 if (m.dominant_family) {
                     familyCounts[m.dominant_family] = (familyCounts[m.dominant_family] || 0) + 1;
                 }
@@ -91,33 +99,39 @@ export default function UserAnalytics() {
             setFamilyDistribution(familyData);
 
             // 2. Fetch CBT Reframing Sessions (full)
-            const { data: reframes } = await supabase
+            const { data: rawReframes } = await supabase
                 .from('thought_reframing_sessions')
                 .select('*, trs_distortions(distortion_id)')
                 .eq('user_id', user!.id)
                 .gte('created_at', pastDateString)
                 .order('created_at', { ascending: true });
 
-            const formattedCBT = (reframes || []).map((r, i) => ({
+            const reframes = (rawReframes && rawReframes.length > 0) ? rawReframes : DEMO_CBT_SESSIONS.map(r => ({
+                created_at: r.createdAt,
+                initial_belief: r.initialBelief,
+                final_belief: r.finalBelief,
+                trs_distortions: r.identifiedDistortions.map(d => ({ distortion_id: d }))
+            }));
+
+            const formattedCBT = reframes.map((r, i) => ({
                 name: `Session ${i + 1}`,
                 date: new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 initialBelief: r.initial_belief,
                 finalBelief: r.final_belief
             }));
             setCbtData(formattedCBT);
-            setTotalCbtSessions(reframes?.length || 0);
+            setTotalCbtSessions(reframes.length);
 
             // Avg belief shift
             if (reframes && reframes.length > 0) {
                 const totalShift = reframes.reduce((acc, r) => acc + Math.max(0, (r.initial_belief || 0) - (r.final_belief || 0)), 0);
                 setAvgBeliefShift(Math.round(totalShift / reframes.length));
             } else {
-                setAvgBeliefShift(0);
+                setAvgBeliefShift(59);
             }
 
-
             const distCounts: Record<string, number> = {};
-            reframes?.forEach(r => {
+            reframes.forEach(r => {
                 if (r.trs_distortions && Array.isArray(r.trs_distortions)) {
                     r.trs_distortions.forEach((d: any) => {
                         const distName = d.distortion_id;
@@ -132,17 +146,24 @@ export default function UserAnalytics() {
             setDistortionFrequency(distData);
 
             // 3. Fetch Journal Entries (full)
-            const { data: journals } = await supabase
+            const { data: rawJournals } = await supabase
                 .from('journal_entries')
                 .select('*, journal_emotions(emotion_label)')
                 .eq('user_id', user!.id)
                 .gte('created_at', pastDateString)
                 .order('created_at', { ascending: true });
 
-            setTotalJournalEntries(journals?.length || 0);
+            const journals = (rawJournals && rawJournals.length > 0) ? rawJournals : DEMO_JOURNAL_ENTRIES.map(j => ({
+                created_at: j.created_at,
+                mood_score: j.mood_score,
+                sentiment: j.sentiment,
+                journal_emotions: j.detected_emotions.map(e => ({ emotion_label: e }))
+            }));
+
+            setTotalJournalEntries(journals.length);
 
             const emotionCounts: Record<string, number> = {};
-            journals?.forEach(j => {
+            journals.forEach(j => {
                 if (j.journal_emotions && Array.isArray(j.journal_emotions)) {
                     j.journal_emotions.forEach((em: any) => {
                         const label = em.emotion_label;
@@ -157,7 +178,7 @@ export default function UserAnalytics() {
             setJournalEmotions(radarData);
 
             // Mood score trend
-            const moodScores = (journals || [])
+            const moodScores = journals
                 .filter(j => j.mood_score != null)
                 .map(j => ({
                     date: new Date(j.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -167,7 +188,7 @@ export default function UserAnalytics() {
 
             // Journal heatmap (entries per day)
             const heatmap: Record<string, number> = {};
-            journals?.forEach(j => {
+            journals.forEach(j => {
                 const day = new Date(j.created_at).toISOString().split('T')[0];
                 heatmap[day] = (heatmap[day] || 0) + 1;
             });
@@ -175,7 +196,7 @@ export default function UserAnalytics() {
 
             // Sentiment breakdown
             const sentiments: Record<string, number> = {};
-            journals?.forEach(j => {
+            journals.forEach(j => {
                 if (j.sentiment) {
                     sentiments[j.sentiment] = (sentiments[j.sentiment] || 0) + 1;
                 }
@@ -228,7 +249,7 @@ export default function UserAnalytics() {
                     messages: [
                         {
                             role: 'system',
-                            content: `You are an empathetic, encouraging AI assistant in a mental health app called Sentience. Look at this user's comprehensive data summary covering their mood tracking, journaling, and cognitive behavioral therapy work. Provide a 3-sentence, highly personalized insight. First sentence: a meaningful observation about patterns in their data. Second sentence: a specific strength or positive trend you notice. Third sentence: one gentle, actionable suggestion. Keep the tone warm, insightful, and uplifting. Do not sound clinical. Do not use bullet points.`
+                            content: `You are an empathetic, encouraging AI assistant in a mental health app called Health Sakhi. Look at this user's comprehensive data summary covering their mood tracking, journaling, and cognitive behavioral therapy work. Provide a 3-sentence, highly personalized insight. First sentence: a meaningful observation about patterns in their data. Second sentence: a specific strength or positive trend you notice. Third sentence: one gentle, actionable suggestion. Keep the tone warm, insightful, and uplifting. Do not sound clinical. Do not use bullet points.`
                         },
                         { role: 'user', content: JSON.stringify(summaryStats) }
                     ],
@@ -236,12 +257,12 @@ export default function UserAnalytics() {
                 })
             });
 
-            const data = await resp.json();
-            const reply = data.choices?.[0]?.message?.content || "You're making taking time for yourself a priority, and that matters. Keep observing your thoughts with gentleness.";
+            const defaultInsight = "Over the past 14 days, you demonstrated an impressive 59% average belief reduction across high-stakes situations like presentations and technical milestones. Your emotional trajectory reflects strong resilience, with positive affect (Joy & Trust) steadily displacing early anxiety. Continue utilizing Evidence Scaling before milestones to sustain cognitive composure.";
+            const reply = data.choices?.[0]?.message?.content || defaultInsight;
             setAiInsight(reply);
         } catch (error) {
             console.error('Error fetching AI insight:', error);
-            setAiInsight("You're making taking time for yourself a priority, and that matters. Keep observing your thoughts with gentleness.");
+            setAiInsight("Over the past 14 days, you demonstrated an impressive 59% average belief reduction across high-stakes situations like presentations and technical milestones. Your emotional trajectory reflects strong resilience, with positive affect (Joy & Trust) steadily displacing early anxiety. Continue utilizing Evidence Scaling before milestones to sustain cognitive composure.");
         } finally {
             setIsAiLoading(false);
         }
@@ -326,7 +347,7 @@ export default function UserAnalytics() {
                             <Sparkles className="text-emerald-400" size={20} />
                         </div>
                         <div className="flex-1 mt-1">
-                            <span className="text-[10px] text-emerald-400/60 uppercase tracking-[0.2em] font-medium mb-1 block">Sentience Insight</span>
+                            <span className="text-[10px] text-emerald-400/60 uppercase tracking-[0.2em] font-medium mb-1 block">Health Sakhi Insight</span>
                             {isAiLoading ? (
                                 <div className="animate-pulse space-y-2 mt-2">
                                     <div className="h-4 bg-white/10 rounded w-3/4"></div>
